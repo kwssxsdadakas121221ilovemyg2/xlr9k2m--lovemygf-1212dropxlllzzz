@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private Gothic Drop</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{
+  margin:0;
+  font-family:'Cinzel',serif;
+  background:linear-gradient(to bottom,#000,#1a1a1a,#330000);
+  color:#ff0000;
+  text-align:center;
+  overflow-x:hidden;
+  position:relative;
+}
+#bg-canvas{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:-1;
+}
+#password-screen{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+#password-screen input{
+  padding:10px;
+  margin:10px;
+  background:black;
+  border:2px solid red;
+  color:red;
+}
+#password-screen button{
+  padding:10px 20px;
+  background:black;
+  border:2px solid red;
+  color:red;
+  cursor:pointer;
+}
+h1{
+  margin-top:40px;
+  text-shadow:0 0 10px red;
+}
+.question{
+  font-size:1.4rem;
+  margin:20px;
+}
+.btn{
+  padding:10px 20px;
+  margin:10px;
+  background:black;
+  border:2px solid red;
+  color:red;
+  cursor:pointer;
+  transition:.3s;
+}
+.btn:hover{
+  transform:scale(1.1);
+  box-shadow:0 0 10px red;
+}
+.music-box{
+  position:fixed;
+  bottom:15px;
+  left:15px;
+  background:black;
+  padding:10px;
+  border:2px solid red;
+  border-radius:8px;
+}
+#alt-mesaj{
+  margin-top:20px;
+  font-size:1.2rem;
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="password-screen">
+  <h2>Şifre Gir</h2>
+  <input type="password" id="password-input" placeholder="Şifre">
+  <button id="password-btn">Giriş</button>
+</div>
+
+<h1>bugün 14 subat olması biseyi degistirmiyor ama</h1>
+
+<div id="question1" class="question">usssss???? biz mi cidden yagmurum</div>
+<button class="btn" id="yes1">Evet</button>
+<button class="btn" id="no1">Hayır</button>
+
+<div id="question2" class="question" style="display:none;">do u liked me</div>
+<button class="btn" id="yes2" style="display:none;">Evet</button>
+<button class="btn" id="no2" style="display:none;">Hayır</button>
+
+<p id="alt-mesaj">Sen mutluysan ben de mutluyum... Karanlıkta bile.</p>
+
+<div class="music-box">
+<select id="music-select">
+<option value="58YMgJIaT8w">Yağmurlar 1</option>
+<option value="MnnAvM6_YxA">Yağmurlar 2</option>
+</select>
+<button id="toggle-sound">🔇</button>
+</div>
+
+<div id="player" style="display:none"></div>
+
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+// PASSWORD
+document.getElementById("password-btn").addEventListener("click", ()=>{
+  const pass = document.getElementById("password-input").value;
+  if(pass==="yagmur14"){
+    document.getElementById("password-screen").style.display="none";
+  } else {
+    alert("Yanlış şifre 😈");
+  }
+});
+
+// LOCAL STORAGE
+function saveAnswer(q,a){ localStorage.setItem(q,a); }
+function loadAnswers(){
+  const q1 = localStorage.getItem("q1");
+  const q2 = localStorage.getItem("q2");
+  if(q1) hideFirst();
+  if(q2==="yes") document.getElementById("alt-mesaj").innerText="Kalp patlaması! ❤️";
+}
+loadAnswers();
+
+// BUTTONS
+const yes1=document.getElementById("yes1");
+const no1=document.getElementById("no1");
+const yes2=document.getElementById("yes2");
+const no2=document.getElementById("no2");
+const question1=document.getElementById("question1");
+const question2=document.getElementById("question2");
+
+function hideFirst(){
+  question1.style.display="none";
+  yes1.style.display="none";
+  no1.style.display="none";
+  question2.style.display="block";
+  yes2.style.display="inline-block";
+  no2.style.display="inline-block";
+}
+
+// Evet/Hayır ve Kalpler
+yes1.addEventListener("click", ()=>{
+  saveAnswer("q1","yes");
+  hideFirst();
+  spawnHearts(20);
+});
+no1.addEventListener("click", ()=>{
+  saveAnswer("q1","no");
+  hideFirst();
+  spawnHearts(20);
+});
+yes2.addEventListener("click", ()=>{
+  saveAnswer("q2","yes");
+  document.getElementById("alt-mesaj").innerText="Kalp patlaması! ❤️";
+  spawnHearts(30);
+});
+no2.addEventListener("mouseover", ()=>{
+  no2.style.position="absolute";
+  no2.style.left=Math.random()*80+"%";
+  no2.style.top=Math.random()*80+"%";
+});
+
+// CANVAS + HEART EFFECT
+const canvas = document.getElementById("bg-canvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+let particles = [];
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach((p,index)=>{
+    ctx.fillStyle="red";
+    ctx.font="20px serif";
+    ctx.fillText(p.text || "❤️", p.x, p.y);
+    p.y -= p.s;
+    if(p.y < 0) particles.splice(index,1);
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+function spawnHearts(count){
+  for(let i=0;i<count;i++){
+    particles.push({
+      x: Math.random()*canvas.width,
+      y: canvas.height,
+      s: Math.random()*2+1,
+      text: "❤️"
+    });
+  }
+}
+
+// YOUTUBE MUSIC
+let player;
+function onYouTubeIframeAPIReady(){
+  player=new YT.Player('player',{
+    height:'0',
+    width:'0',
+    videoId:'58YMgJIaT8w',
+    playerVars:{ autoplay:1, loop:1, playlist:'58YMgJIaT8w', mute:1, playsinline:1 }
+  });
+}
+const musicSelect=document.getElementById("music-select");
+const toggleBtn=document.getElementById("toggle-sound");
+let isMuted=true;
+
+musicSelect.addEventListener("change", ()=>{
+  player.loadVideoById({videoId:musicSelect.value});
+  player.mute();
+  toggleBtn.innerText="🔇";
+  isMuted=true;
+});
+
+toggleBtn.addEventListener("click", ()=>{
+  if(isMuted){
+    player.unMute();
+    toggleBtn.innerText="🔊";
+  } else {
+    player.mute();
+    toggleBtn.innerText="🔇";
+  }
+  isMuted=!isMuted;
+});
+</script>
+</body>
+</html>
